@@ -46,13 +46,13 @@ cargo build --release
 Run the checker by specifying your bonds directly on the command line:
 
 ```bash
-bondsbot --bonds "420AB123456-420AB123500,300XY987654,591CD789000-591CD789050"
+bondsbot "420AB123456-420AB123500,300XY987654,591CD789000-591CD789050"
 ```
 
 Or if using the development build:
 
 ```bash
-cargo run -- --bonds "420AB123456-420AB123500,300XY987654,591CD789000-591CD789050"
+cargo run -- "420AB123456-420AB123500,300XY987654,591CD789000-591CD789050"
 ```
 
 ### Bond Format
@@ -77,12 +77,12 @@ You can specify bonds in two ways:
 Use the `--verbose` flag to see detailed checking output:
 
 ```bash
-bondsbot --bonds "420AB123456-420AB123500" --verbose
+bondsbot "420AB123456-420AB123500" --verbose
 ```
 
 ### Command Line Options
 
--   `--bonds` or `-b`: Bond ranges to check (required)
+-   `bonds`: Bond ranges to check (positional argument, required)
 -   `--verbose` or `-v`: Enable verbose output showing detailed checking process
 
 The tool will:

@@ -4,7 +4,7 @@ use bondsbot::{parse_bonds, get_html, get_winners, check_winners};
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
-    #[arg(short, long)]
+    #[arg()]
     bonds: String,
     #[arg(short, long, default_value_t = false)]
     verbose: bool,
