@@ -108,13 +108,14 @@ checksum = "34efbcccd345379ca2868b2b2c9d3782e9cc58ba87bc7d79d5b53d9c9ae6f25d"
 
 [[package]]
 name = "bondsbot"
-version = "0.2.0"
+version = "0.3.0"
 dependencies = [
  "clap",
  "reqwest",
  "scraper",
  "serde",
  "serde_json",
+ "thousands",
 ]
 
 [[package]]
@@ -1524,6 +1525,12 @@ dependencies = [
  "mac",
  "utf-8",
 ]
+
+[[package]]
+name = "thousands"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3bf63baf9f5039dadc247375c29eb13706706cfde997d0330d05aa63a77d8820"
 
 [[package]]
 name = "tinystr"

@@ -31,8 +31,11 @@ pub fn get_winners(html: &str) -> Result<Vec<Winner>, Box<dyn std::error::Error>
 
         if let Some(bond) = cells.get(1) {
              if !bond.is_empty() {
-                 res.push(Winner {
-                    prize_value: format!("£{}", cells.get(0).cloned().unwrap_or_default().trim()),
+                let prize_value_raw = cells.get(0).cloned().unwrap_or_default();
+                let prize_value = prize_value_raw.trim();
+                res.push(Winner {
+                    prize_value_str: format!("£{}", prize_value),
+                    prize_value: prize_value.replace(',', "").parse::<u64>().unwrap_or(0),
                     winning_bond: bond.to_string(),
                 });
             }
@@ -84,7 +87,8 @@ mod tests {
         assert!(result.is_ok());
         let winners = result.unwrap();
         assert_eq!(winners.len(), 1);
-        assert_eq!(winners[0].prize_value, "£1000");
+        assert_eq!(winners[0].prize_value_str, "£1000");
+        assert_eq!(winners[0].prize_value, 1000);
         assert_eq!(winners[0].winning_bond, "123AB456789");
     }
 

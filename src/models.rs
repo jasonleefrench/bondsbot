@@ -1,7 +1,8 @@
 #[derive(Debug)]
 pub struct Winner {
-    pub prize_value: String,
+    pub prize_value_str: String,
     pub winning_bond: String,
+    pub prize_value: u64,
 }
 
 #[derive(serde::Deserialize, Debug)]
