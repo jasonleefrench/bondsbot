@@ -1,10 +1,10 @@
 # Bondsbot
 
-A Rust CLI tool that checks your UK Premium Bonds against the latest winning numbers from NS&I (National Savings & Investments).
+A Rust CLI tool that checks your UK Premium Bonds against the latest high-value winning numbers from NS&I (National Savings & Investments).
 
 ## Overview
 
-Bondsbot scrapes the [NS&I Prize Checker](https://www.nsandi.com/prize-checker/winners) website and compares the winning bond numbers against your own bonds to see if you've won any prizes.
+Bondsbot scrapes the [NS&I Prize Checker](https://www.nsandi.com/prize-checker/winners) website and compares the winning bond numbers against your own bonds to see if you've won a high-value prize. High-value prizes are published on the Prize Checker on the first working day of the month, the day before other prizes, so you can see if you've won before you get the official notification on the app!
 
 ## Features
 
