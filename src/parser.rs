@@ -17,7 +17,7 @@ pub fn parse_bonds(bonds_str: &str) -> Result<Vec<Bond>, Box<dyn std::error::Err
                 start: number,
                 end: number,
             };
-            bond.validate().map_err(|e| format!("Bond validation failed: {}", e))?;
+            bond.validate().map_err(|e| format!("Bond validation failed: {e}"))?;
             bonds.push(bond);
         } else if parts.len() == 2 {
             // Bond range
@@ -28,7 +28,7 @@ pub fn parse_bonds(bonds_str: &str) -> Result<Vec<Bond>, Box<dyn std::error::Err
             let (end_prefix, end_num) = parse_bond_number(end_bond)?;
             
             if prefix != end_prefix {
-                return Err(format!("Prefix mismatch in range: {} vs {}", prefix, end_prefix).into());
+                return Err(format!("Prefix mismatch in range: {prefix} vs {end_prefix}").into());
             }
             
             let bond = Bond {
@@ -37,10 +37,10 @@ pub fn parse_bonds(bonds_str: &str) -> Result<Vec<Bond>, Box<dyn std::error::Err
                 end: end_num,
             };
             
-            bond.validate().map_err(|e| format!("Bond validation failed: {}", e))?;
+            bond.validate().map_err(|e| format!("Bond validation failed: {e}"))?;
             bonds.push(bond);
         } else {
-            return Err(format!("Invalid bond format: {}", bond_item).into());
+            return Err(format!("Invalid bond format: {bond_item}").into());
         }
     }
     
@@ -72,7 +72,7 @@ fn check_for_duplicates(bonds: &[Bond]) -> Result<(), Box<dyn std::error::Error>
         let msg = if duplicate_bonds.len() > 5 {
             format!("Duplicate bonds detected: {} (and {} more)", first_few, duplicate_bonds.len() - 5)
         } else {
-            format!("Duplicate bonds detected: {}", first_few)
+            format!("Duplicate bonds detected: {first_few}")
         };
         return Err(msg.into());
     }
@@ -81,8 +81,8 @@ fn check_for_duplicates(bonds: &[Bond]) -> Result<(), Box<dyn std::error::Error>
         for j in (i + 1)..bonds.len() {
             let bond = &bonds[i];
             let other = &bonds[j];
-            if bond.prefix == other.prefix {
-                if ranges_overlap(bond.start, bond.end, other.start, other.end) {
+            if bond.prefix == other.prefix
+                && ranges_overlap(bond.start, bond.end, other.start, other.end) {
                     let overlap_start = bond.start.max(other.start);
                     let overlap_end = bond.end.min(other.end);
                     return Err(format!(
@@ -91,7 +91,6 @@ fn check_for_duplicates(bonds: &[Bond]) -> Result<(), Box<dyn std::error::Error>
                         other.prefix, other.start, other.prefix, other.end,
                         bond.prefix, overlap_start, bond.prefix, overlap_end
                     ).into());
-                }
             }
         }
     }
@@ -114,23 +113,23 @@ pub fn parse_bond_number(bond_str: &str) -> Result<(String, u64), Box<dyn std::e
     }
     
     let last_letter_index = last_letter_index
-        .ok_or_else(|| format!("No letters found in bond: {}", bond_str))?;
+        .ok_or_else(|| format!("No letters found in bond: {bond_str}"))?;
     
     let split_index = last_letter_index + 1;
     
     if split_index >= bond_str.len() {
-        return Err(format!("No number part found in bond: {}", bond_str).into());
+        return Err(format!("No number part found in bond: {bond_str}").into());
     }
     
     let prefix = bond_str[..split_index].to_string();
     let number_part = &bond_str[split_index..];
     
     if number_part.is_empty() {
-        return Err(format!("No number part found in bond: {}", bond_str).into());
+        return Err(format!("No number part found in bond: {bond_str}").into());
     }
     
     let number = number_part.parse::<u64>()
-        .map_err(|_| format!("Invalid number in bond: {}", bond_str))?;
+        .map_err(|_| format!("Invalid number in bond: {bond_str}"))?;
     
     Ok((prefix, number))
 }

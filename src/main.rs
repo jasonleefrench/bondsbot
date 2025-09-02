@@ -17,14 +17,14 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         
     for bond in &bonds {
         bond.validate()
-            .map_err(|e| format!("Invalid bond data: {}", e))?;
+            .map_err(|e| format!("Invalid bond data: {e}"))?;
     }
-    
+
     let html = get_html("https://www.nsandi.com/prize-checker/winners")?;
 
     if args.verbose {
         let month = get_month(&html)?;
-        println!("Checking winners for: {}", month);
+        println!("Checking winners for: {month}");
     }
 
     let winners = get_winners(&html)?;  
