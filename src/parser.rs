@@ -1,4 +1,5 @@
 use crate::models::Bond;
+use std::collections::HashSet;
 
 pub fn parse_bonds(bonds_str: &str) -> Result<Vec<Bond>, Box<dyn std::error::Error>> {
     let mut bonds = Vec::new();
@@ -43,7 +44,63 @@ pub fn parse_bonds(bonds_str: &str) -> Result<Vec<Bond>, Box<dyn std::error::Err
         }
     }
     
+    check_for_duplicates(&bonds)?;
+    
     Ok(bonds)
+}
+
+fn check_for_duplicates(bonds: &[Bond]) -> Result<(), Box<dyn std::error::Error>> {
+    let mut seen_bonds = HashSet::new();
+    let mut duplicate_bonds = Vec::new();
+    
+    for bond in bonds.iter() {
+        for num in bond.start..=bond.end {
+            let bond_id = format!("{}{}", bond.prefix, num);
+            if !seen_bonds.insert(bond_id.clone()) {
+                duplicate_bonds.push(bond_id);
+            }
+        }
+    }
+    
+    if !duplicate_bonds.is_empty() {
+        let first_few = duplicate_bonds.iter()
+            .take(5)
+            .cloned()
+            .collect::<Vec<_>>()
+            .join(", ");
+        
+        let msg = if duplicate_bonds.len() > 5 {
+            format!("Duplicate bonds detected: {} (and {} more)", first_few, duplicate_bonds.len() - 5)
+        } else {
+            format!("Duplicate bonds detected: {}", first_few)
+        };
+        return Err(msg.into());
+    }
+    
+    for i in 0..bonds.len() {
+        for j in (i + 1)..bonds.len() {
+            let bond = &bonds[i];
+            let other = &bonds[j];
+            if bond.prefix == other.prefix {
+                if ranges_overlap(bond.start, bond.end, other.start, other.end) {
+                    let overlap_start = bond.start.max(other.start);
+                    let overlap_end = bond.end.min(other.end);
+                    return Err(format!(
+                        "Overlapping bond ranges detected: {}{}-{}{} and {}{}-{}{} (overlap: {}{}-{}{})",
+                        bond.prefix, bond.start, bond.prefix, bond.end,
+                        other.prefix, other.start, other.prefix, other.end,
+                        bond.prefix, overlap_start, bond.prefix, overlap_end
+                    ).into());
+                }
+            }
+        }
+    }
+    
+    Ok(())
+}
+
+fn ranges_overlap(start1: u64, end1: u64, start2: u64, end2: u64) -> bool {
+    !(end1 < start2 || end2 < start1)
 }
 
 fn parse_bond_number(bond_str: &str) -> Result<(String, u64), Box<dyn std::error::Error>> {
@@ -174,5 +231,70 @@ mod tests {
     fn test_parse_bonds_invalid_format() {
         let result = parse_bonds("632QA322573-632QA322622-extra");
         assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_duplicate_single_bonds() {
+        let result = parse_bonds("224BZ748917,224BZ748917");
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Duplicate bonds detected"));
+        assert!(err_msg.contains("224BZ748917"));
+    }
+
+    #[test]
+    fn test_duplicate_in_range() {
+        let result = parse_bonds("632QA322570-632QA322575,632QA322573");
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Duplicate bonds detected"));
+        assert!(err_msg.contains("632QA322573"));
+    }
+
+    #[test]
+    fn test_overlapping_ranges() {
+        let result = parse_bonds("632QA322570-632QA322580,632QA322575-632QA322585");
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Duplicate bonds detected") || err_msg.contains("Overlapping bond ranges detected"));
+    }
+
+    #[test]
+    fn test_fully_contained_range() {
+        let result = parse_bonds("632QA322570-632QA322590,632QA322575-632QA322585");
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Duplicate bonds detected") || err_msg.contains("Overlapping bond ranges detected"));
+    }
+
+    #[test]
+    fn test_adjacent_ranges_no_overlap() {
+        let result = parse_bonds("632QA322570-632QA322580,632QA322581-632QA322590");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_different_prefix_no_overlap() {
+        let result = parse_bonds("632QA322570-632QA322580,632QB322570-632QB322580");
+        assert!(result.is_ok());
+    }
+
+    #[test]
+    fn test_multiple_duplicates() {
+        let result = parse_bonds("224BZ748917,632QA322573,224BZ748917,632QA322573,420AB123456");
+        assert!(result.is_err());
+        let err_msg = result.unwrap_err().to_string();
+        assert!(err_msg.contains("Duplicate bonds detected"));
+    }
+
+    #[test]
+    fn test_ranges_overlap_helper() {
+        assert!(ranges_overlap(1, 5, 3, 7));
+        assert!(ranges_overlap(3, 7, 1, 5));
+        assert!(ranges_overlap(1, 10, 5, 6));
+        assert!(ranges_overlap(5, 6, 1, 10));
+        assert!(!ranges_overlap(1, 5, 6, 10));
+        assert!(!ranges_overlap(6, 10, 1, 5));
+        assert!(ranges_overlap(1, 5, 5, 10));
     }
 }
