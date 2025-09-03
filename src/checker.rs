@@ -13,33 +13,25 @@ pub fn check_winners(my_bonds: &[Bond], winners: &[Winner], verbose: &bool) {
                 println!("Checking bond group {} against winner {}...", bond.prefix, winner.winning_bond);
             }
             let prefix_len = bond.prefix.len();
-            
             // Check bounds before slicing
             if winner.winning_bond.len() < prefix_len {
                 continue;
             }
-            
             let winner_prefix = &winner.winning_bond[..prefix_len];
-
             if winner_prefix != bond.prefix {
                 continue;
             }
-
             if winner.winning_bond.len() <= prefix_len {
                 continue;
             }
-
             let winning_number = match winner.winning_bond[prefix_len..].parse::<u64>() {
                 Ok(num) => num,
                 Err(_) => continue,
             };
-
             if winning_number < bond.start || winning_number > bond.end {
                 continue;
             }
-
             println!("You have won {} with bond {}", winner.prize_value_str, winner.winning_bond);
-            
             total_won += winner.prize_value;
             has_won = true;
         }
