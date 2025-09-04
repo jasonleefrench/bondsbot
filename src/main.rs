@@ -15,10 +15,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let bonds = parse_bonds(&args.bonds)?;
         
-    for bond in &bonds {
-        bond.validate()
-            .map_err(|e| format!("Invalid bond data: {e}"))?;
-    }
+    bonds.iter().try_for_each(|bond| 
+        bond.validate().map_err(|e| format!("Invalid bond data: {e}"))
+    )?;
 
     let html = get_html("https://www.nsandi.com/prize-checker/winners")?;
 
@@ -29,6 +28,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let winners = get_winners(&html)?;  
 
-    check_winners(&bonds, &winners, &args.verbose);
+    check_winners(&bonds, &winners, args.verbose);
     Ok(())
 }

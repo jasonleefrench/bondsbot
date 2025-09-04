@@ -31,12 +31,11 @@ pub fn get_winners(html: &str) -> Result<Vec<Winner>, Box<dyn std::error::Error>
 
         if let Some(bond) = cells.get(1) {
              if !bond.is_empty() {
-                let prize_value_raw = cells.first().cloned().unwrap_or_default();
-                let prize_value = prize_value_raw.trim();
+                let prize_value = cells.first().map_or("", |s| s.trim());
                 res.push(Winner {
                     prize_value_str: format!("£{prize_value}"),
                     prize_value: prize_value.replace(',', "").parse::<u64>().unwrap_or(0),
-                    winning_bond: bond.to_string(),
+                    winning_bond: bond.clone(),
                 });
             }
         }
@@ -50,11 +49,11 @@ pub fn get_month(html: &str) -> Result<String, Box<dyn std::error::Error>> {
     let month_selector = scraper::Selector::parse("h1.high-value-header")
         .map_err(|e| format!("Failed to parse selector: {e}"))?;
 
-    if let Some(element) = document.select(&month_selector).next() {
-        let text: String = element.text().collect();
-        let month = text.trim().to_string().replace("'s high value winners", "");
-        return Ok(month);
-    }
-
-    Err("Month not found in HTML".into())
+    document.select(&month_selector)
+        .next()
+        .map(|element| {
+            let text: String = element.text().collect();
+            text.trim().replace("'s high value winners", "")
+        })
+        .ok_or_else(|| "Month not found in HTML".into())
 }

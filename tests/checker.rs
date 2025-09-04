@@ -14,7 +14,7 @@ fn test_check_winners_matching_bond() {
         winning_bond: "123AB456789".to_string(),
     }];
     
-    check_winners(&bonds, &winners, &true);
+    check_winners(&bonds, &winners, true);
 }
 
 #[test]
@@ -30,5 +30,5 @@ fn test_check_winners_no_match() {
         winning_bond: "123AB456789".to_string(),
     }];
     
-    check_winners(&bonds, &winners, &true);
+    check_winners(&bonds, &winners, true);
 }
