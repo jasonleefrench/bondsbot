@@ -6,19 +6,7 @@ A Rust CLI tool that checks your UK Premium Bonds against the latest high-value 
 
 Bondsbot scrapes the [NS&I Prize Checker](https://www.nsandi.com/prize-checker/winners) website and compares the winning bond numbers against your own bonds to see if you've won a high-value prize. High-value prizes are published on the Prize Checker on the first working day of the month, the day before other prizes, so you can see if you've won before you get the official notification on the app!
 
-## Features
-
--   Scrapes latest winning numbers from NS&I website
--   Command-line interface for easy bond specification
--   Validates your bond data format
--   Checks your bonds against all winning numbers
--   Reports any matches with prize amounts
--   Verbose mode for detailed checking output
--   Comprehensive test coverage
-
 ## Installation
-
-### Option 1: Install from Source
 
 1. Clone this repository:
 
@@ -30,13 +18,7 @@ cd bondsbot
 2. Install the CLI tool globally:
 
 ```bash
-cargo install --path .
-```
-
-### Option 2: Development Build
-
-```bash
-cargo build --release
+cargo install --path
 ```
 
 ## Usage
@@ -102,4 +84,4 @@ cargo test
 
 ## Disclaimer
 
-Please respect NS&I's terms of service when using this tool. This tool is unofficial, for personal use only, and is not affiliated with NS&I. Always verify any potential winnings through official NS&I channels.
+This tool is unofficial, for personal use only, and is not affiliated with NS&I. Always verify any potential winnings through official NS&I channels.
