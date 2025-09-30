@@ -1,4 +1,5 @@
-use bondsbot::parser::{parse_bonds, parse_bond_number, ranges_overlap};
+use bondsbot::parser::{parse_bonds, parse_bonds_from_file, parse_bond_number, ranges_overlap};
+use std::fs;
 
 #[test]
 fn test_parse_bond_number() {
@@ -157,4 +158,64 @@ fn test_ranges_overlap_helper() {
     assert!(!ranges_overlap(1, 5, 6, 10));
     assert!(!ranges_overlap(6, 10, 1, 5));
     assert!(ranges_overlap(1, 5, 5, 10));
+}
+
+#[test]
+fn test_parse_bonds_from_file() {
+    let temp_file = "test_bonds.txt";
+    let content = "224BZ748917,632QA322573-632QA322622,420AB123456";
+
+    fs::write(temp_file, content).unwrap();
+
+    let result = parse_bonds_from_file(temp_file);
+    assert!(result.is_ok());
+
+    let bonds = result.unwrap();
+    assert_eq!(bonds.len(), 3);
+    assert_eq!(bonds[0].prefix, "224BZ");
+    assert_eq!(bonds[1].prefix, "632QA");
+    assert_eq!(bonds[2].prefix, "420AB");
+
+    fs::remove_file(temp_file).unwrap();
+}
+
+#[test]
+fn test_parse_bonds_from_file_with_newlines() {
+    let temp_file = "test_bonds_newlines.txt";
+    let content = "224BZ748917,\n632QA322573-632QA322622,\n420AB123456";
+
+    fs::write(temp_file, content).unwrap();
+
+    let result = parse_bonds_from_file(temp_file);
+    assert!(result.is_ok());
+
+    let bonds = result.unwrap();
+    assert_eq!(bonds.len(), 3);
+
+    fs::remove_file(temp_file).unwrap();
+}
+
+#[test]
+fn test_parse_bonds_auto_detects_file() {
+    let temp_file = "test_bonds_auto.txt";
+    let content = "224BZ748917,632QA322573-632QA322622";
+
+    fs::write(temp_file, content).unwrap();
+
+    // parse_bonds should automatically detect it's a file
+    let result = parse_bonds(temp_file);
+    assert!(result.is_ok());
+
+    let bonds = result.unwrap();
+    assert_eq!(bonds.len(), 2);
+
+    fs::remove_file(temp_file).unwrap();
+}
+
+#[test]
+fn test_parse_bonds_from_nonexistent_file() {
+    let result = parse_bonds_from_file("nonexistent_file.txt");
+    assert!(result.is_err());
+    let err_msg = result.unwrap_err().to_string();
+    assert!(err_msg.contains("Failed to read file"));
 }

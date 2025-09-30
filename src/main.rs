@@ -4,6 +4,7 @@ use bondsbot::{parse_bonds, get_html, get_winners, get_month, check_winners};
 #[derive(Parser, Debug)]
 #[command(version, about, long_about = None)]
 struct Args {
+    /// Bond numbers (comma-separated) or path to a file containing bonds
     #[arg()]
     bonds: String,
     #[arg(short, long, default_value_t = false)]

@@ -49,15 +49,23 @@ Run the checker by specifying your bonds directly on the command line:
 bondsbot "420AB123456-420AB123500,300XY987654,591CD789000-591CD789050"
 ```
 
+Or read bonds from a file:
+
+```bash
+bondsbot bonds.txt
+```
+
 Or if using the development build:
 
 ```bash
 cargo run -- "420AB123456-420AB123500,300XY987654,591CD789000-591CD789050"
+# or
+cargo run -- bonds.txt
 ```
 
 ### Bond Format
 
-You can specify bonds in two ways:
+Bonds can be specified directly on the command line or in a file. The format is the same for both:
 
 **Single bonds:** Just provide the bond number
 
@@ -72,6 +80,14 @@ You can specify bonds in two ways:
 
 -   Example: `"300XY987654,420AB123456-420AB123500,591CD789000"`
 
+**File format:** Create a text file with your bonds in the same comma-separated format (newlines are also supported):
+
+```
+420AB123456-420AB123500,
+300XY987654,
+591CD789000-591CD789050
+```
+
 ### Verbose Mode
 
 Use the `--verbose` flag to see detailed checking output:
@@ -82,7 +98,7 @@ bondsbot "420AB123456-420AB123500" --verbose
 
 ### Command Line Options
 
--   `bonds`: Bond ranges to check (positional argument, required)
+-   `bonds`: Bond ranges to check or path to a file containing bonds (positional argument, required)
 -   `--verbose` or `-v`: Enable verbose output showing detailed checking process
 
 The tool will:
